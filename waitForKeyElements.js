@@ -73,7 +73,7 @@ function waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, ma
 
 function cancelWaitForKeyElement(id) {
     if (window._waitForKeyElementsMap[id]) {
-        window._waitForKeyElementsMap[id] = false;
+        delete window._waitForKeyElementsMap[id];
     }
 }
 
