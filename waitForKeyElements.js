@@ -22,7 +22,13 @@
  * @param {number}            [interval=300]     - The time (ms) to wait between iterations.
  * @param {number}            [maxIntervals=-1]  - The max number of intervals to run (negative number for unlimited).
  */
-function waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals) {
+function waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals, id) {
+    if (typeof id === 'undefined') {
+        id = window._waitForKeyElementsNum++;
+        window._waitForKeyElementsMap[id] = true;
+    } else if (!window._waitForKeyElementsMap[id]) {
+        return;
+    }
     if (typeof waitOnce === "undefined") {
         waitOnce = true;
     }
@@ -59,7 +65,18 @@ function waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, ma
     if (maxIntervals !== 0 && !(targetsFound && waitOnce)) {
         maxIntervals -= 1;
         setTimeout(function() {
-            waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals);
+            waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals, id);
         }, interval);
     }
+    return id;
 }
+
+function cancelWaitForKeyElement(id) {
+    if (window._waitForKeyElementsMap[id]) {
+        window._waitForKeyElementsMap[id] = false;
+    }
+}
+
+// Hack: register instances
+window._waitForKeyElementsMap = {};
+window._waitForKeyElementsNum = 0;
